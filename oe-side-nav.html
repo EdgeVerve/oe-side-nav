@@ -156,7 +156,8 @@
          */
         groupName: {
           type: String,
-          value: '_app_nav_group_'
+          value: '_app_nav_group_',
+          observer: '_groupNameChanged'
         },
 
         /**
@@ -212,7 +213,9 @@
         this.filterText = '';
         this._getNavLinks(undefined);
       },
-
+      _groupNameChanged: function(newgroup){
+        this._getNavLinks();  
+      },
       /**
        * Fetches the nav links based on a `parent`
        */
@@ -228,7 +231,7 @@
 
           var response = event.detail.response;
 
-          if (self.selectedRoute) {
+          if (parent && self.selectedRoute) {
 
             self.set('selectedRoute.children', response.length ? response : null);
 
@@ -237,7 +240,6 @@
             } else {
               response.length && self._update_navStack(self.selectedRoute);
             }
-
           } else {
             var navList = response;
             if (self.extraLinks) {
@@ -268,7 +270,12 @@
           buildIncludeFilter(includeFilter, this.levelsToFetch);
           filter.include = includeFilter;
         }
-        filter.where.group = this.groupName;
+
+        if(this.groupName && this.groupName !== '*'){
+          filter.where.or = [{group:this.groupName},{group:'*'}];
+        } else {
+          filter.where.group = '*';
+        }
         filter.order = 'sequence ASC';
         return filter;
       },
