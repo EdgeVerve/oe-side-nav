@@ -148,7 +148,10 @@
          */
         restUrl: {
           type: String,
-          value: '/api/NavigationLinks'
+          value: function(){
+		    var restApiRoot = (window.OEUtils && window.OEUtils.restApiRoot) ? window.OEUtils.restApiRoot : '/api';
+		    return restApiRoot + '/NavigationLinks';
+		  }
         },
 
         /**
