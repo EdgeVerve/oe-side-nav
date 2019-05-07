@@ -5,7 +5,8 @@
  */
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "oe-i18n-msg/oe-i18n-msg.js";
-import "@polymer/iron-dropdown/iron-dropdown.js";
+import "@polymer/paper-menu-button/paper-menu-button.js"
+
 import "@polymer/paper-tooltip/paper-tooltip.js";
 import "@polymer/paper-toolbar/paper-toolbar.js";
 import "@polymer/paper-icon-button/paper-icon-button.js";
@@ -18,7 +19,7 @@ import { OECommonMixin } from "oe-mixins/oe-common-mixin.js";
 import { OEAjaxMixin } from "oe-mixins/oe-ajax-mixin.js";
 import "@polymer/iron-icon/iron-icon.js";
 import "@polymer/iron-icons/iron-icons.js";
-
+import "@polymer/iron-flex-layout/iron-flex-layout-classes.js";
 /**
  * ### oe-side-nav
  * 
@@ -47,7 +48,7 @@ class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
 
   static get template() {
     return html`
-    <style>
+    <style include="iron-flex iron-flex-alignment iron-flex-layout">
     oe-side-nav-item {
       height: calc(100vh - 104px);
       display: block;
@@ -60,11 +61,18 @@ class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
         color: var(--menu-link-color);
       }
   
-      paper-listbox a {
+      paper-item div {
         color: inherit;
+        width: 100%;
+        height: 48px;
+        text-decoration: none;
+        cursor: pointer;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
   
         @apply --layout-horizontal;
         @apply --layout-center;
+        @apply --oe-side-nav-route;
       }
   
       iron-icon {
@@ -87,53 +95,51 @@ class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
         padding-right: 10px;
         padding-left: 10px;
       }
-  
     </style>
   
+      <a id="anchorTag" hidden></a>
       <paper-toolbar>
         <paper-icon-button icon="menu" slot="top"></paper-icon-button>
-        <div class="title" slot="top">
-          <oe-i18n-msg msgid="[[title]]">[[title]]</oe-i18n-msg>
+        <div slot="top">
+          <template is="dom-if" if=[[_navStack.length]]>
+            <paper-menu-button>
+              <paper-button slot="dropdown-trigger" alt="menu">[[title]]</paper-button>
+              <paper-listbox slot="dropdown-content">
+                <template is="dom-repeat" items=[[_navStack]]>
+                  <paper-item on-tap="_goBack">[[item.title]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-menu-button>
+          </template>
+          <template is="dom-if" if=[[!_navStack.length]]>
+            <paper-button><oe-i18n-msg msgid="[[title]]"></oe-i18n-msg></paper-button>
+          </template>
         </div>
-        <template is="dom-if" if=[[_navStack.length]]>
-          <div slot="top">
-            <paper-icon-button id="nav-back-icon" icon="icons:arrow-back" on-down="_handleBack" on-up="_handleBack"></paper-icon-button>
-            <iron-dropdown horizontal-align="right" opened="{{show_navStackItems}}">
-              <div slot="dropdown-content">
-                <paper-listbox>
-                  <template is="dom-repeat" items=[[_navStack]]>
-                    <paper-item on-tap="_goBack"> [[item.title]] </paper-item>
-                  </template>
-                </paper-listbox>
-              </div>
-            </iron-dropdown>
-          </div>
-        </template>
       </paper-toolbar>
       <template is="dom-if" if=[[showSearchBar]]>
         <div class="search-box">
           <oe-input no-label-float placeholder="Search Navigation Links" value="{{filterText}}">
             <iron-icon slot="suffix" icon="icons:search"></iron-icon>
           </oe-input>
-  
         </div>
       </template>
       <template is="dom-if" if=[[filterText.length]]>
         <paper-listbox no-animations>
           <template is="dom-repeat" items=[[filteredNavList]]>
-            <paper-item slot="dropdown-trigger" class="dropdown-trigger" on-keydown="openPage">
-              <template is="dom-if" if=[[item.url]]>
-                <a on-tap="_pageSelected" data-route="[[item.name]]" href="[[item.url]]">
+            <template is="dom-if" if=[[item.url]]>
+              <paper-item on-keydown="openPage" on-tap="_pageSelected" data-route="[[item.name]]">
                   <iron-icon class="icon" icon="[[item.icon]]"></iron-icon>
-                  <oe-i18n-msg class="title" msgid="[[item.label]]"> [[item.label]]</oe-i18n-msg>
-                </a>
-              </template>
-            </paper-item>
+                  <oe-i18n-msg class="title" msgid="[[item.label]]"></oe-i18n-msg>
+              </paper-item>
+            </template>
           </template>
         </paper-listbox>
       </template>
       <template is="dom-if" if=[[!filterText.length]]>
-        <oe-side-nav-item no-links=[[noLinks]] id="side-nav-item" nested=[[nested]] selected-route={{selectedRoute}} nav-items={{navList}}></oe-side-nav-item>
+        <oe-side-nav-item no-links=[[noLinks]] 
+            id="side-nav-item" nested=[[nested]] 
+            selected-route={{selectedRoute}} nav-items={{navList}}
+            on-navlink-clicked='_onNavLinkClicked'></oe-side-nav-item>
       </template>
       `;
   }
@@ -330,7 +336,7 @@ class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
 
     this.set('navList', selectedRoute.children);
 
-    this.title = selectedRoute.name;
+    this.set('title', selectedRoute.name);
   }
   /**
    * Handles tap or tap and hold action on tha back button.
@@ -389,21 +395,31 @@ class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
    */
   _pageSelected(e) {
 
-    if (this.noLinks) {
-      e.preventDefault();
+    var selectedRoute = e.model.item;
+
+    this.set('selectedRoute', selectedRoute);
+    this.set(filterText, '');
+
+    if(selectedRoute.children && selectedRoute.children.length>0){
+      this._openTillSelectedPage(selectedRoute);
+    } else if(!this.noLinks && selectedRoute.url) {
+      this.$.anchorTag.href = selectedRoute.url;
+      this.$.anchorTag.click();  
     }
-    this.selectedRoute = e.model.item;
-    this.filterText = '';
-    this._openTillSelectedPage(this);
+  }
+
+  _onNavLinkClicked(e){
+    this.$.anchorTag.href = e.detail.url;
+    this.$.anchorTag.click();
   }
   /**
    * Opens all collapsed nav content till the selected level.
    */
-  _openTillSelectedPage() {
+  _openTillSelectedPage(selectedRoute) {
 
     var navList = this.navList;
 
-    var path = pathToLeafNode(navList, this.selectedRoute);
+    var path = pathToLeafNode(navList, selectedRoute);
 
     path.forEach(function (node) {
       node.opened = true;
@@ -472,7 +488,7 @@ var buildIncludeFilter = function (obj, level) {
 var findMatchingNavItems = function (navList, filteredNavList, filterText) {
   var filterString = filterText.toLowerCase();
   navList.forEach(function (nav) {
-    if (nav.name.toLowerCase().indexOf(filterString) != -1) {
+    if (nav.label.toLowerCase().indexOf(filterString) != -1) {
       filteredNavList.push(nav);
     }
     nav.children && findMatchingNavItems(nav.children, filteredNavList, filterText);
