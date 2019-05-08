@@ -22,7 +22,7 @@ Any unauthorized reproduction, storage, transmission in any form or by any means
 
   <script src="../node_modules/sinon/pkg/sinon.js"></script>
   <script src="../node_modules/fakerest/dist/FakeRest.min.js"></script>
-  
+  <!-- <script type="module" src="/@polymer/iron-test-helpers/mock-interactions.js"></script> -->
   <script type="module" src="../oe-side-nav.js"></script>
 
 
@@ -56,13 +56,6 @@ Any unauthorized reproduction, storage, transmission in any form or by any means
         "topLevel": true,
         "sequence": 9999,
         "id": "59f3442db486d92829fbd849",
-        "_type": "NavigationLink",
-        "_createdBy": "system",
-        "_modifiedBy": "system",
-        "_createdOn": "2017-10-27T14:35:23.166Z",
-        "_modifiedOn": "2017-10-27T14:35:23.166Z",
-        "_isDeleted": false,
-        "_version": "85b36e04-7083-48b5-a49c-3fb514c308ce",
         "children": []
       }, {
         "name": "MyTasks",
@@ -73,13 +66,6 @@ Any unauthorized reproduction, storage, transmission in any form or by any means
         "topLevel": true,
         "sequence": 9999,
         "id": "59f6ca8c1b5758d8202c9c5d",
-        "_type": "NavigationLink",
-        "_createdBy": "john",
-        "_modifiedBy": "john",
-        "_createdOn": "2017-10-30T06:45:32.710Z",
-        "_modifiedOn": "2017-10-30T06:45:32.710Z",
-        "_isDeleted": false,
-        "_version": "6b74983b-d56d-4bc4-ad35-e5edcc0fe285",
         "children": []
       }, {
         "name": "machine",
@@ -90,13 +76,6 @@ Any unauthorized reproduction, storage, transmission in any form or by any means
         "topLevel": true,
         "sequence": 9999,
         "id": "5a16c2e5964aa5bc28427ece",
-        "_type": "NavigationLink",
-        "_createdBy": "system",
-        "_modifiedBy": "system",
-        "_createdOn": "2017-11-23T12:45:25.184Z",
-        "_modifiedOn": "2017-11-23T12:45:25.184Z",
-        "_isDeleted": false,
-        "_version": "963b50e8-0fc2-4164-9c97-066b8e6c2416",
         "children": []
       }, {
         "name": "vehicle",
@@ -107,13 +86,6 @@ Any unauthorized reproduction, storage, transmission in any form or by any means
         "topLevel": true,
         "sequence": 9999,
         "id": "5a16c2e5964aa5bc28427ecf",
-        "_type": "NavigationLink",
-        "_createdBy": "system",
-        "_modifiedBy": "system",
-        "_createdOn": "2017-11-23T12:45:25.210Z",
-        "_modifiedOn": "2017-11-23T12:45:25.210Z",
-        "_isDeleted": false,
-        "_version": "f16ca979-52b5-4c1a-ad3c-eef31458cad0",
         "children": [ {
         "name": "car",
         "url": "/car",
@@ -123,13 +95,6 @@ Any unauthorized reproduction, storage, transmission in any form or by any means
         "topLevel": true,
         "sequence": 9999,
         "id": "5a16c2e5964aa5bc28427ecf",
-        "_type": "NavigationLink",
-        "_createdBy": "system",
-        "_modifiedBy": "system",
-        "_createdOn": "2017-11-23T12:45:25.210Z",
-        "_modifiedOn": "2017-11-23T12:45:25.210Z",
-        "_isDeleted": false,
-        "_version": "f16ca979-52b5-4c1a-ad3c-eef31458cad0",
         "children": []
       }]
       }, {
@@ -141,13 +106,6 @@ Any unauthorized reproduction, storage, transmission in any form or by any means
         "topLevel": true,
         "sequence": 9999,
         "id": "5a16c2e5964aa5bc28427ed0",
-        "_type": "NavigationLink",
-        "_createdBy": "system",
-        "_modifiedBy": "system",
-        "_createdOn": "2017-11-23T12:45:25.230Z",
-        "_modifiedOn": "2017-11-23T12:45:25.230Z",
-        "_isDeleted": false,
-        "_version": "1f8c9eb7-01be-46e9-8451-4d4cc798cc2e",
         "children": []
       }]
 
@@ -185,11 +143,9 @@ Any unauthorized reproduction, storage, transmission in any form or by any means
           ele.set('selectedRoute',selectedRoute);
           flush(function(){
             assert.equal(ele.title, selectedRoute.name);
-            var backArrow = ele.shadowRoot.querySelector('#nav-back-icon');
-            backArrow.fire("down");
+            var backItem = ele.shadowRoot.querySelector('paper-menu-button paper-listbox paper-item');
+            MockInteractions.tap(backItem);
             ele.async(function(){
-              backArrow.fire("down");
-              backArrow.fire("up");
               flush(function(){
                 assert.equal(ele.title, undefined);
                 done();
@@ -205,12 +161,14 @@ Any unauthorized reproduction, storage, transmission in any form or by any means
           ele.set('filterText', 'department');
           flush(function () {
             assert.equal(ele.filteredNavList.length, 1);
-            var linkEle = ele.shadowRoot.querySelector('paper-item.dropdown-trigger a');
-            var href = linkEle.getAttribute('href');
+            var linkEle = ele.shadowRoot.querySelectorAll('paper-item');
+            assert.equal(linkEle.length, 1);
+            assert.equal(linkEle[0].innerText.toLowerCase(), 'department');
+
             ele.set('noLinks', true);
-            linkEle.click();
+            MockInteractions.tap(linkEle[0]);
             flush(function () {
-              assert.equal(ele.selectedRoute.url, href);
+              assert.equal(ele.selectedRoute.url, '/department');
               done();
             });
           });

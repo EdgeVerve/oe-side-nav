@@ -398,7 +398,7 @@ class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
     var selectedRoute = e.model.item;
 
     this.set('selectedRoute', selectedRoute);
-    this.set(filterText, '');
+    this.set('filterText', '');
 
     if(selectedRoute.children && selectedRoute.children.length>0){
       this._openTillSelectedPage(selectedRoute);
