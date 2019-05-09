@@ -17,6 +17,7 @@
     "@polymer/paper-menu-button": "3.0.1",
     "@polymer/paper-toolbar": "3.0.1",
     "@polymer/paper-tooltip": "3.0.1",
+    "@polymer/iron-collapse": "^3.0.1",
     "oe-ajax": "git+http://evgit/oecloud.io/oe-ajax.git#master",
     "oe-i18n-msg": "git+http://evgit/oecloud.io/oe-i18n-msg.git#master",
     "oe-input": "git+http://evgit/oecloud.io/oe-input.git#master"

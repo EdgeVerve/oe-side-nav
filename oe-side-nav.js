@@ -39,6 +39,7 @@ import "@polymer/iron-flex-layout/iron-flex-layout-classes.js";
  * @polymer
  * @appliesMixin OEAjaxMixin
  * @appliesMixin OECommonMixin
+ * @demo demo/demo-oe-side-nav.html
  */
 class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
 
