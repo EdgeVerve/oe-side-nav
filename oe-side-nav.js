@@ -31,6 +31,8 @@ import "@polymer/iron-flex-layout/iron-flex-layout-classes.js";
  * 
  * |Custom property | Description | Default|
  * |----------------|:-------------:|----------:|
+ * |`--oe-side-nav-toolbar` | Mixin to be applied to side nav paper toolbar | {}|
+ * |`--oe-side-nav-item`  | Mixin to be applied to oe-side-nav-item element | {}|  
  * |`--oe-side-nav-route` | Mixin to be applied to a route item  | null|
  * |`--oe-side-nav-route-selected` | Mixin to be applied to the selected route item | {}|
  * |`--oe-side-nav-route-selected-color` | color to be applied to the selected route item | --primary-color|
@@ -49,12 +51,25 @@ class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
   static get template() {
     return html`
     <style include="iron-flex iron-flex-alignment iron-flex-layout">
-    oe-side-nav-item {
-      height: calc(100vh - 104px);
-      display: block;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
+      :host {
+        display: block;
+      }
+
+      paper-toolbar { 
+        height: 64px;
+
+        @apply --oe-side-nav-toolbar;
+      }
+      
+      oe-side-nav-item {
+        height: calc(100vh - 64px);
+        display: block;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        @apply --oe-side-nav-item;
+      }
+     
       paper-listbox {
         padding: 0;
         width:100%;
@@ -99,7 +114,7 @@ class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
   
       <a id="anchorTag" hidden></a>
       <paper-toolbar>
-        <paper-icon-button icon="menu" slot="top"></paper-icon-button>
+        <paper-icon-button on-tap="_handleMenuClick" icon="menu" slot="top"></paper-icon-button>
         <div slot="top">
           <template is="dom-if" if=[[_navStack.length]]>
             <paper-menu-button>
@@ -461,6 +476,13 @@ class OeSideNav extends OEAjaxMixin(OECommonMixin(PolymerElement)) {
   connectedCallback() {
     super.connectedCallback();
     this.initializeFun();
+  }
+
+  /**
+   * @param {Event} e event on menu tap.
+   */
+  _handleMenuClick(e) {
+    this.fire('oe-side-bar-menu-click');
   }
 }
 window.customElements.define(OeSideNav.is, OeSideNav);
