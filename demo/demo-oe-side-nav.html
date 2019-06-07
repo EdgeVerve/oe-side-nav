@@ -1,0 +1,90 @@
+<!--
+  Â©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),
+  Bangalore, India. All Rights Reserved.
+-->
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <title>oe-side-nav</title>
+  <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="../node_modules/sinon/pkg/sinon.js"></script>
+  <script src="../node_modules/fakerest/dist/FakeRest.min.js"></script>
+
+  <script type="module">
+    import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
+    import '@polymer/iron-demo-helpers/demo-snippet';
+    import '@polymer/polymer/lib/elements/dom-bind.js';
+    import '../oe-side-nav.js';
+  </script>
+
+</head>
+<script>
+  var navList = [
+  {
+    "name": "loan-elibility-1",
+    "url": "/loaneligiblity-1",
+    "label": "Check Eligibility",
+    "group": "root",
+    "topLevel": true,
+    "children": [{
+        "name": "MyTasks",
+        "url": "/my-tasks",
+        "label": "My Tasks",
+        "icon": "star",
+        "group": "root",
+        "topLevel": true,
+        "sequence": 9999,
+        "children": [{
+        "name": "machine",
+        "url": "/machine",
+        "label": "Machine",
+        "icon": "icons:query-builder",
+        "group": "root",
+        "topLevel": true,
+        "children": []
+      }]
+      }]
+  },
+  {
+    "name": "Tasks ",
+    "url": "/my-tasks",
+    "label": "My tasks",
+    "group": "root",
+    "topLevel": true,
+    "children": [{
+        "name": "ServicePersonalization",
+        "url": "/demo/servicePersonalization",
+        "label": "Service Personalization",
+        "group": "root",
+        "topLevel": true,
+        "sequence": 9999,
+        "children": []
+      }]
+  }
+]
+
+</script>
+<body unresolved>
+  <style>
+  </style>
+  <div id="demo" class="vertical-section-container centered">
+      <h3>Side-Nav </h3>
+    <demo-snippet id="snippet"> 
+      <template>
+        <oe-side-nav id="nav-1" title="Menu" nested group-name="root"></oe-side-nav>
+        <script>
+        setTimeout(function () {
+            var workflow = document.querySelector('#nav-1');
+            workflow.set('navList', navList);
+          }, 2000);
+        </script>
+      </template>
+    </demo-snippet>
+  </div>
+</body>
+
+</html>

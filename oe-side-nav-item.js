@@ -8,6 +8,7 @@ import "@polymer/iron-icon/iron-icon.js";
 import "@polymer/paper-item/paper-item.js";
 import { OECommonMixin } from "oe-mixins/oe-common-mixin.js";
 import "@polymer/iron-icons/iron-icons.js";
+import "@polymer/iron-collapse/iron-collapse.js";
 
 
 /**
@@ -59,6 +60,7 @@ class OeSideNavItem extends OECommonMixin(PolymerElement) {
     paper-item .collapse-state-icon {
       position: absolute;
       right: 10px;
+      cursor: pointer;
       padding: 15px 0;
       transition: 0.3s all ease-in;
     }
@@ -92,7 +94,6 @@ class OeSideNavItem extends OECommonMixin(PolymerElement) {
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
   </style>
 
   <template is="dom-repeat" items={{navItems}} id="items">
@@ -102,7 +103,7 @@ class OeSideNavItem extends OECommonMixin(PolymerElement) {
         <oe-i18n-msg class="title" msgid="[[item.label]]"></oe-i18n-msg>
       </div>
       <template is="dom-if" if="[[item.children.length]]">
-        <iron-icon class="collapse-state-icon" icon=[[_getExpandIcon(nested)]]></iron-icon>
+        <iron-icon class="collapse-state-icon" icon=[[_getExpandIcon(nested)]] on-tap="_pageSelected"></iron-icon>
       </template>
     </paper-item>
 
