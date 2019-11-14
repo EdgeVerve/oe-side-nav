@@ -6,8 +6,6 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/iron-icon/iron-icon.js";
 import "@polymer/paper-item/paper-item.js";
-import "@polymer/paper-menu-button/paper-menu-button.js";
-import "@polymer/paper-listbox/paper-listbox.js";
 import { OECommonMixin } from "oe-mixins/oe-common-mixin.js";
 import "@polymer/iron-icons/iron-icons.js";
 
@@ -41,18 +39,7 @@ class OeSideNavItem extends OECommonMixin(PolymerElement) {
     :host {
       width: 100%;
     }
-   
 
-    paper-menu-button {
-      padding: 0;
-      color: var(--menu-link-color);
-      width:100%;
-      /* background: var(--accent-color); */
-
-      --paper-menu-button-content: {
-        font-weight: normal;
-      }
-    }
     iron-icon {
       opacity: 0.54;
 
@@ -77,26 +64,7 @@ class OeSideNavItem extends OECommonMixin(PolymerElement) {
     }
 
     paper-item.expanded .collapse-state-icon {
-      transform: rotate(90deg);
-    }
-
-    paper-item a {
-      color: inherit;
-      width: 100%;
-      height: 48px;
-      text-decoration: none;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-
-      @apply --layout-horizontal;
-      @apply --layout-center;
-      @apply --oe-side-nav-route;
-    }
-
-    paper-item a.selected-route {
-      color: var(--oe-side-nav-route-selected-color, --primary-color);
-
-      @apply --oe-side-nav-route-selected;
+      transform: rotate(180deg);
     }
 
     paper-item div {
@@ -115,7 +83,6 @@ class OeSideNavItem extends OECommonMixin(PolymerElement) {
 
     paper-item div.selected-route {
       color: var(--oe-side-nav-route-selected-color, --primary-color);
-
       @apply --oe-side-nav-route-selected;
     }
 
@@ -128,50 +95,29 @@ class OeSideNavItem extends OECommonMixin(PolymerElement) {
 
   </style>
 
-    <paper-menu-button no-animations>
-      <template is="dom-repeat" items={{navItems}} id="items">
-        <template is="dom-if" if=[[!nested]]>
-          <paper-item slot="dropdown-trigger" class="dropdown-trigger [[_computeExpandedClass(item.opened)]]"  on-keydown="openPage">
-            <a class$="[[_computeSelectedRouteClass(item,selectedRoute)]]" on-tap="_pageSelected" data-route="[[item.name]]" href="[[item.url]]">
-              <iron-icon class="icon" icon="[[item.icon]]"></iron-icon>
-              <oe-i18n-msg class="title" msgid="[[item.label]]"> [[item.label]]</oe-i18n-msg>
-            </a>
-            <template is="dom-if" if="[[item.children.length]]">
-              <iron-icon hidden$=[[!nested]] class="collapse-state-icon" icon="icons:chevron-right"></iron-icon>
-            </template>
-          </paper-item>
-        </template>
-        <template is="dom-if" if=[[nested]]>
-          <paper-listbox class="nav-link-submenu"> 
-            <iron-collapse opened="{{item.opened}}">
-              <paper-item slot="dropdown-trigger" class="dropdown-trigger [[_computeExpandedClass(item.opened)]]" on-keydown="openPage">
-                <template is="dom-if" if="[[item.children.length]]">
-                  <div class$="[[_computeSelectedRouteClass(item,selectedRoute)]]" on-tap="_pageSelected" data-route="[[item.name]]">
-                    <iron-icon class="icon" icon=[[item.icon]]></iron-icon>
-                    <oe-i18n-msg class="title" msgid="[[item.label]]"> [[item.label]]</oe-i18n-msg>
-                  </div>
-                  <iron-icon class="collapse-state-icon" icon="icons:chevron-right"></iron-icon>
-                </template>
-                <template is="dom-if" if="[[!item.children.length]]">
-                  <a class$="[[_computeSelectedRouteClass(item,selectedRoute)]]" on-tap="_pageSelected" data-route="[[item.name]]" href="[[item.url]]">
-                    <iron-icon class="icon" icon=[[item.icon]]></iron-icon>
-                    <oe-i18n-msg class="title" msgid="[[item.label]]"> [[item.label]]</oe-i18n-msg>
-                  </a>
-                </template>
-              </paper-item>
-              <template is="dom-if" if="[[item.children.length]]">
-                <paper-listbox id="menu" slot="dropdown-content">
-                  <paper-item>
-                    <oe-side-nav-item no-links=[[noLinks]] nested=[[nested]] id="child-nav-item" selected-route={{selectedRoute}} nav-items={{item.children}}
-                      level=[[nextLevel]]></oe-side-nav-item>
-                  </paper-item>
-                </paper-listbox> 
-              </template>
-            </iron-collapse>
-          </paper-listbox> 
-        </template>
+  <template is="dom-repeat" items={{navItems}} id="items">
+    <paper-item class$="[[_computeExpandedClass(item.opened, nested)]]" on-keydown="openPage">
+      <div class$="[[_computeSelectedRouteClass(item,selectedRoute)]]" on-tap="_pageSelected" data-route="[[item.name]]">
+        <iron-icon class="icon" icon=[[item.icon]]></iron-icon>
+        <oe-i18n-msg class="title" msgid="[[item.label]]"></oe-i18n-msg>
+      </div>
+      <template is="dom-if" if="[[item.children.length]]">
+        <iron-icon class="collapse-state-icon" icon=[[_getExpandIcon(nested)]]></iron-icon>
       </template>
-    </paper-menu-button>
+    </paper-item>
+
+    <template is="dom-if" if=[[nested]]>
+      <template is="dom-if" if="[[item.children.length]]">
+        <iron-collapse opened="{{item.opened}}">
+            <paper-item>
+              <oe-side-nav-item no-links=[[noLinks]] nested=[[nested]] id="child-nav-item" selected-route={{selectedRoute}} nav-items={{item.children}}
+                level=[[nextLevel]]></oe-side-nav-item>
+            </paper-item>
+        </iron-collapse>
+      </template>
+
+    </template>
+  </template>
   `;
   }
   static get properties() {
@@ -217,10 +163,19 @@ class OeSideNavItem extends OECommonMixin(PolymerElement) {
    * @param {Event} e change event from input.
    */
   _pageSelected(e) {
-    this.set('selectedRoute', null);
-    this.set('selectedRoute', e.model.item);
-    if (this.noLinks) {
-      e.preventDefault();
+    var selectedRoute = e.model.item;
+    this.set('selectedRoute', selectedRoute);
+
+    if(selectedRoute.children && selectedRoute.children.length>0){
+      e.model.set('item.opened', !e.model.item.opened);
+    } else if(!this.noLinks && selectedRoute.url) {
+      let event = new Event('navlink-clicked', {
+        bubbles: true,
+        cancelable: true,
+        composed: true
+      });
+      event.detail = selectedRoute;
+      this.dispatchEvent(event);
     }
   }
   /**
@@ -242,13 +197,22 @@ class OeSideNavItem extends OECommonMixin(PolymerElement) {
   _computeSelectedRouteClass(item, selectedRoute) {
     return item == selectedRoute ? 'selected-route' : '';
   }
+
+  /**
+   * Returns different icons for nested and non-nested side-nav.
+   * @param {*} nested 
+   */
+  _getExpandIcon(nested){
+    return nested? 'icons:expand-more': 'icons:chevron-right';
+  }
+
   /**
    * opened has a value then it returns expanded class.
    * @param {item} opened property of item.
    * @return {HTMLElement} property of paper-item component.
    */
-  _computeExpandedClass(opened) {
-    return opened ? 'expanded' : '';
+  _computeExpandedClass(opened, nested) {
+    return opened && nested ? 'expanded' : '';
   }
   /**
    * Incrementing level to nextLevel.
