@@ -2,7 +2,7 @@
   "name": "oe-side-nav",
   "description": "oecloud side navigation",
   "main": "oe-side-nav.js",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "scripts": {
     "test": "polymer test --module-resolution node --skip-selenium-install",
     "lint": "eslint .",
@@ -17,6 +17,7 @@
     "@polymer/paper-menu-button": "^3.0.1",
     "@polymer/paper-toolbar": "^3.0.1",
     "@polymer/paper-tooltip": "^3.0.1",
+    "@polymer/iron-collapse": "^3.0.1",
     "oe-ajax": "^2.0.0",
     "oe-i18n-msg": "^2.0.0",
     "oe-input": "^2.0.0"
